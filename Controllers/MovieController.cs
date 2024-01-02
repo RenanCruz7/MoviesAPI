@@ -13,7 +13,8 @@ public class MovieController : ControllerBase
     [HttpPost]
     public void AddMovie([FromBody]Movie movie)
     {
-        movies.Add(movie);
-        Console.WriteLine(movie.Title);
+            movies.Add(movie);
+            Console.WriteLine(movie.Title);
+            Console.WriteLine(movie.Duration);
     }
 }
