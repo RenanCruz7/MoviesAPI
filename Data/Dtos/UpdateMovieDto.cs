@@ -7,10 +7,7 @@ DTOs nos ajudam a não deixar nosso modelo de banco de dados exposto.
 Como fazer conversões práticas entre diferentes tipos através do AutoMapper.
  */
 
-
-
-
-public class CreateMovieDto
+public class UpdateMovieDto
 {
     [Required(ErrorMessage = "O Título é obrigatorio")]
     public string Title { get; set; }
