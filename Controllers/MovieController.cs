@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using MoviesAPI.Data;
 using MoviesAPI.Models;
 
 namespace MoviesAPI.Controllers;
@@ -9,30 +10,35 @@ namespace MoviesAPI.Controllers;
 public class MovieController : ControllerBase
 {
 
-    private static List<Movie> movies = new List<Movie>();
-    private static int id = 0;
+    private MovieContext _context;
+
+    public MovieController(MovieContext context)
+    {
+        _context = context;
+    }
+
 
 
     [HttpGet]
     // Skip e take paginando as consultas
     public IEnumerable<Movie> ListMovies([FromQuery]int skip = 0, int take = 50)
     {
-        return movies.Skip(skip).Take(take);
+        return _context.Movies.Skip(skip).Take(take);
     }
 
     [HttpGet("{id}")]
     public IActionResult ListMovieByID(int id)
     {
-        var movie = movies.FirstOrDefault(movie => movie.Id == id);
+        var movie = _context.Movies.FirstOrDefault(movie => movie.Id == id);
         if (movie == null) return NotFound();
-        return Ok();
+        return Ok(movie);
     }
 
     [HttpPost]
     public CreatedAtActionResult AddMovie ([FromBody]Movie movie)
     {
-            movie.Id = id++;
-            movies.Add(movie);
-            return CreatedAtAction(nameof(ListMovieByID), new {id = movie.Id},movie);
+        _context.Movies.Add(movie);
+        _context.SaveChanges();
+        return CreatedAtAction(nameof(ListMovieByID), new {id = movie.Id},movie);
     }
 }
