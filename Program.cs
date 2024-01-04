@@ -1,4 +1,14 @@
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
+using MoviesAPI.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Conexão com o Banco de dados
+var connectionString = builder.Configuration.GetConnectionString("MovieConnection");
+
+builder.Services.AddDbContext<MovieContext>(opts =>
+    opts.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 // Add services to the container.
 
