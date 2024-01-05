@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using MoviesAPI.Data;
@@ -14,14 +15,11 @@ public class MovieController : ControllerBase
 
     private MovieContext _context;
     private IMapper _mapper;
-
     public MovieController(MovieContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
     }
-
-
 
     [HttpGet]
     // Skip e take paginando as consultas
@@ -58,6 +56,23 @@ public class MovieController : ControllerBase
     }
 
 
+    [HttpPatch("{id}")]
+    public IActionResult PatchMovie(int id,JsonPatchDocument<UpdateMovieDto> patch)
+    {
+        var movie = _context.Movies.FirstOrDefault(movie => movie.Id == id);
+        if (movie == null) return NotFound();
 
+        var movieToPatch = _mapper.Map<UpdateMovieDto>(movie);
 
+        patch.ApplyTo(movieToPatch, ModelState);
+
+        if (!TryValidateModel(movieToPatch))
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        _mapper.Map(movieToPatch, movie);
+        _context.SaveChanges();
+        return NoContent();
+    }
 }
